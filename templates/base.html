@@ -3,7 +3,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>{% block title %}QUITESCAN - Student Attendance System{% endblock %}</title>
     <link rel="icon" href="{% static 'images/Quitescan logo.png' %}" sizes="32x32">
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
@@ -147,6 +150,25 @@
         .number-counter:hover {
             transform: scale(1.1);
         }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .hover-scale:hover {
+                transform: none;
+            }
+            
+            .table-row:hover {
+                transform: none;
+            }
+            
+            .mobile-text-sm {
+                font-size: 0.875rem;
+            }
+            
+            .mobile-p-4 {
+                padding: 1rem;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -154,7 +176,7 @@
     <!-- Navigation -->
     <nav class="gradient-bg shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-2">
+            <div class="flex justify-between items-center py-2 flex-wrap">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <a href="{% url 'index' %}" class="flex items-center space-x-3">
@@ -162,7 +184,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 sm:space-x-4 flex-wrap">
                     <div class="relative">
                             <button id="about-toggle" type="button" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1">
                                 <span>About</span>
