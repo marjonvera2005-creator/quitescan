@@ -163,10 +163,7 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    {% if user.is_authenticated and user.is_staff %}
-                        <a href="{% url 'admin_dashboard' %}" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium">Admin Panel</a>
-                        <button onclick="showLogoutModal()" class="bg-white text-orange-600 hover:bg-yellow-100 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
-                        <div class="relative">
+                    <div class="relative">
                             <button id="about-toggle" type="button" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1">
                                 <span>About</span>
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -220,6 +217,10 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    {% if user.is_authenticated and user.is_staff %}
+                        <a href="{% url 'admin_dashboard' %}" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium">Admin Panel</a>
+                        <button onclick="showLogoutModal()" class="bg-white text-orange-600 hover:bg-yellow-100 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
                     {% else %}
                         <a href="{% url 'student_scan' %}" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium">Scan QR Code</a>
                         {% if not user.is_authenticated %}
