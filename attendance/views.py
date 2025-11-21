@@ -48,7 +48,17 @@ def admin_gate(request):
         if password == ADMIN_GATE_PASSWORD:
             # Set a simple session flag
             request.session['admin_gate_ok'] = True
-            # Redirect to admin dashboard
+            # Create or login admin user
+            from django.contrib.auth.models import User
+            from django.contrib.auth import login
+            admin_user, created = User.objects.get_or_create(
+                username='quitescan_admin',
+                defaults={'is_staff': True, 'is_superuser': True}
+            )
+            if created:
+                admin_user.set_password('admin123')
+                admin_user.save()
+            login(request, admin_user)
             return redirect('admin_dashboard')
         else:
             messages.error(request, 'Incorrect password')

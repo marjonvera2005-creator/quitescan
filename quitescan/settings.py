@@ -16,7 +16,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-quitescan-secret-key-
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*'] if DEBUG else os.environ.get('ALLOWED_HOSTS', '').split(',')
-CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in os.environ.get('ALLOWED_HOSTS', '').split(',') if host and host not in ['127.0.0.1', 'localhost']]
+CSRF_TRUSTED_ORIGINS = ['https://quitescan.onrender.com'] if not DEBUG else []
 
 # Application definition
 INSTALLED_APPS = [
