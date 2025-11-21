@@ -2,3 +2,5 @@ Django
 gunicorn
 whitenoise
 dj-database-url
+qrcode
+Pillow

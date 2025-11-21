@@ -16,6 +16,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-quitescan-secret-key-
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if host != '127.0.0.1' and host != 'localhost']
 
 # Application definition
 INSTALLED_APPS = [
@@ -112,5 +113,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Login URLs
-LOGIN_URL = '/admin/login/'
+LOGIN_URL = '/admin-gate/'
 LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
