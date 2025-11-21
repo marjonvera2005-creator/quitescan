@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}All Weekly Attendance - QUITESCAN{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="gradient-bg rounded-2xl p-8 text-white">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">All Weekly Attendance Records</h1>
+                <p class="text-xl">Complete list of weekly attendance statistics</p>
+            </div>
+            <a href="{% url 'admin_dashboard' %}" class="bg-white text-orange-600 px-6 py-3 rounded-xl font-semibold hover:bg-yellow-100 transition duration-200">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Weekly Records Table -->
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+        <div class="flex flex-wrap gap-4 justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Weekly Attendance Summary</h2>
+            <div class="flex items-center gap-4">
+                <form method="get" class="flex items-center gap-2">
+                    <label for="month-filter" class="text-sm font-medium text-gray-600">Month</label>
+                    <select id="month-filter" name="month" class="px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-yellow-400 focus:border-transparent" onchange="this.form.submit()">
+                        <option value="">All months</option>
+                        {% for month in month_options %}
+                            <option value="{{ month.value }}" {% if month.value == selected_month_str %}selected{% endif %}>{{ month.label }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <a href="{% url 'attendance_report' %}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition duration-200">
+                    ← Back to Report
+                </a>
+            </div>
+        </div>
+        {% if selected_month_str %}
+        <div class="bg-blue-50 border border-blue-100 text-blue-800 text-sm rounded-2xl px-4 py-3 mb-6 flex flex-wrap gap-3 justify-between items-center">
+            <span>Showing weekly attendance for <span class="font-semibold">{{ selected_month_display }}</span></span>
+            <a href="?" class="text-blue-600 hover:text-blue-800 font-semibold">Clear filter</a>
+        </div>
+        {% endif %}
+        
+        {% if weekly_page %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Week</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unique Students</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for item in weekly_page %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ item.week|date:"M d, Y" }} – {{ item.week_end|date:"M d, Y" }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    <span class="text-2xl font-bold text-green-600">{{ item.unique_students }}</span>
+                                    <span class="text-sm text-gray-500 ml-2">students</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if weekly_page.has_other_pages %}
+            <div class="mt-6 flex justify-center">
+                <nav class="flex space-x-2">
+                    {% if weekly_page.has_previous %}
+                        <a href="?{% if selected_month_str %}month={{ selected_month_str }}&{% endif %}page=1" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">First</a>
+                        <a href="?{% if selected_month_str %}month={{ selected_month_str }}&{% endif %}page={{ weekly_page.previous_page_number }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Previous</a>
+                    {% endif %}
+                    <span class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                        Page {{ weekly_page.number }} of {{ weekly_page.paginator.num_pages }}
+                    </span>
+                    {% if weekly_page.has_next %}
+                        <a href="?{% if selected_month_str %}month={{ selected_month_str }}&{% endif %}page={{ weekly_page.next_page_number }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Next</a>
+                        <a href="?{% if selected_month_str %}month={{ selected_month_str }}&{% endif %}page={{ weekly_page.paginator.num_pages }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Last</a>
+                    {% endif %}
+                </nav>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4">📊</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">No Weekly Data</h3>
+                <p class="text-gray-600">No weekly attendance records found</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

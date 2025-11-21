@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student List - QUITESCAN{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="gradient-bg rounded-2xl p-8 text-white">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <img src="{% static 'images/Quitescan logo.png' %}" alt="QUITESCAN Logo" class="h-16 w-auto">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Student List</h1>
+                    <p class="text-xl">Manage all registered students and their QR codes</p>
+                </div>
+            </div>
+            <a href="{% url 'admin_dashboard' %}" class="bg-white text-orange-600 px-6 py-3 rounded-xl font-semibold hover:bg-yellow-100 transition duration-200">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        <div class="flex flex-col md:flex-row gap-4">
+            <input type="text" id="searchInput" placeholder="Search students..." 
+                   class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200">
+            <select id="statusFilter" class="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Students Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="studentsGrid">
+        {% for student in students %}
+        <div class="bg-white rounded-2xl shadow-lg p-6 hover-scale student-card" 
+             data-name="{{ student.first_name|lower }} {{ student.last_name|lower }}" 
+             data-id="{{ student.student_id|lower }}"
+             data-status="{{ student.status }}">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">{{ student.first_name }} {{ student.last_name }}</h3>
+                    <p class="text-gray-600">ID: {{ student.student_id }}</p>
+                    <p class="text-gray-600">{{ student.email }}</p>
+                    {% if student.department %}
+                        <p class="text-gray-500 text-sm">Department: {{ student.department }}</p>
+                    {% endif %}
+                </div>
+                <div class="text-right">
+                    {% if student.status == 'active' %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Active
+                        </span>
+                    {% else %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Inactive
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- QR Code Display -->
+            {% if student.qr_image %}
+            <div class="text-center mb-4">
+                <div class="bg-gray-50 rounded-xl p-4 inline-block">
+                    <img src="{{ student.qr_image.url }}" alt="QR Code for {{ student.first_name }}" 
+                         class="w-32 h-32 mx-auto border-2 border-gray-200 rounded-lg">
+                </div>
+                <p class="text-xs text-gray-500 mt-2">QR Code</p>
+            </div>
+            {% else %}
+            <div class="text-center mb-4">
+                <div class="bg-gray-50 rounded-xl p-4 inline-block">
+                    <div class="w-32 h-32 mx-auto border-2 border-gray-200 rounded-lg flex items-center justify-center">
+                        <span class="text-gray-400">No QR</span>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">QR Code</p>
+            </div>
+            {% endif %}
+
+            <!-- Student Info -->
+            <div class="space-y-2 text-sm text-gray-600">
+                <div class="flex justify-between">
+                    <span>Registered:</span>
+                    <span>{{ student.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>QR Code:</span>
+                    <span class="font-mono text-xs">{{ student.qr_code|truncatechars:10 }}</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex space-x-2 mt-4">
+                <button onclick="downloadQR('{{ student.qr_code }}', '{{ student.first_name }} {{ student.last_name }}')" 
+                        class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:from-blue-600 hover:to-blue-700 transition duration-200">
+                    📥 Download QR
+                </button>
+                <button onclick="copyQRCode('{{ student.qr_code }}')" 
+                        class="bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 transition duration-200">
+                    📋 Copy
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <div class="text-6xl mb-4">👥</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">No Students Found</h3>
+            <p class="text-gray-600 mb-6">Start by registering your first student</p>
+            <a href="{% url 'register_student' %}" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition duration-200 hover-scale">
+                Register Student
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if students.has_other_pages %}
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        <div class="flex justify-center">
+            <nav class="flex space-x-2">
+                {% if students.has_previous %}
+                    <a href="?page=1" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">First</a>
+                    <a href="?page={{ students.previous_page_number }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Previous</a>
+                {% endif %}
+                <span class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                    Page {{ students.number }} of {{ students.paginator.num_pages }}
+                </span>
+                {% if students.has_next %}
+                    <a href="?page={{ students.next_page_number }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Next</a>
+                    <a href="?page={{ students.paginator.num_pages }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Last</a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Statistics -->
+    {% if students %}
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Summary</h2>
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="text-center">
+                <p class="text-2xl font-bold text-blue-600">{{ students.paginator.count }}</p>
+                <p class="text-sm text-gray-600">Total Students</p>
+            </div>
+            <div class="text-center">
+                <p class="text-2xl font-bold text-green-600">{{ students.paginator.count }}</p>
+                <p class="text-sm text-gray-600">Active Students</p>
+            </div>
+            <div class="text-center">
+                <p class="text-2xl font-bold text-yellow-600">{{ students.paginator.count }}</p>
+                <p class="text-sm text-gray-600">Total Records</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', filterStudents);
+document.getElementById('statusFilter').addEventListener('change', filterStudents);
+
+function filterStudents() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const statusFilter = document.getElementById('statusFilter').value;
+    const cards = document.querySelectorAll('.student-card');
+
+    cards.forEach(card => {
+        const name = card.dataset.name;
+        const id = card.dataset.id;
+        const status = card.dataset.status;
+        
+        const matchesSearch = name.includes(searchTerm) || id.includes(searchTerm);
+        const matchesStatus = !statusFilter || status === statusFilter;
+        
+        if (matchesSearch && matchesStatus) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Copy QR code to clipboard
+function copyQRCode(qrCode) {
+    navigator.clipboard.writeText(qrCode).then(() => {
+        showNotification('QR code copied to clipboard!', 'success');
+    }).catch(() => {
+        showNotification('Failed to copy QR code', 'error');
+    });
+}
+
+// Download QR code
+function downloadQR(qrCode, studentName) {
+    // Create a canvas with the QR code
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 300;
+    canvas.height = 350;
+    
+    // Background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 300, 350);
+    
+    // Title
+    ctx.fillStyle = '#1f2937';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('QUITESCAN QR Code', 150, 30);
+    
+    // Student name
+    ctx.font = '14px Arial';
+    ctx.fillText(studentName, 150, 50);
+    
+    // QR code placeholder (you would need to generate actual QR code here)
+    ctx.fillStyle = '#f3f4f6';
+    ctx.fillRect(75, 70, 150, 150);
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '12px Arial';
+    ctx.fillText('QR Code', 150, 145);
+    
+    // QR code text
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '10px monospace';
+    ctx.fillText(qrCode, 150, 250);
+    
+    // Download
+    const link = document.createElement('a');
+    link.download = `qr_${studentName.replace(/\s+/g, '_')}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+    
+    showNotification('QR code downloaded!', 'success');
+}
+
+// Show notification
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

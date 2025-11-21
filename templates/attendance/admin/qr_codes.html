@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student QR Codes - QUITESCAN{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="gradient-bg rounded-2xl p-8 text-white">
+        <div class="flex items-center space-x-4">
+            <img src="{% static 'images/Quitescan logo.png' %}" alt="QUITESCAN Logo" class="h-16 w-auto">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">Student QR Codes</h1>
+                <p class="text-xl">All active student QR codes for attendance scanning</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-800">QR Code Cards</h2>
+            <div class="space-x-4">
+                <button onclick="window.print()" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition duration-200">
+                    🖨️ Print All QR Codes
+                </button>
+                <a href="{% url 'admin_dashboard' %}" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition duration-200">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Codes Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for student in students %}
+        <div class="bg-white rounded-2xl shadow-lg p-6 hover-scale print-break">
+            <!-- Student Info -->
+            <div class="text-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">{{ student.first_name }} {{ student.last_name }}</h3>
+                <p class="text-gray-600">ID: {{ student.student_id }}</p>
+                <p class="text-gray-600 text-sm">{{ student.email }}</p>
+            </div>
+
+            <!-- QR Code -->
+            {% if student.qr_image %}
+            <div class="text-center mb-4">
+                <div class="bg-gray-50 rounded-xl p-4 inline-block">
+                    <img src="{{ student.qr_image.url }}" 
+                         alt="QR Code for {{ student.first_name }}" 
+                         class="w-48 h-48 mx-auto border-2 border-gray-200 rounded-lg">
+                </div>
+            </div>
+
+            <!-- QR Code Text -->
+            <div class="text-center mb-4">
+                <p class="text-sm font-semibold text-gray-700 mb-2">QR Code Text:</p>
+                <div class="bg-gray-100 p-3 rounded-lg">
+                    <code class="text-xs text-gray-800 break-all">{{ student.qr_code }}</code>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="text-center text-sm text-gray-600">
+                <p>📱 Scan this QR code to check in/out</p>
+                <p class="mt-1">Student: {{ student.first_name }} {{ student.last_name }}</p>
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <div class="text-4xl mb-4">❌</div>
+                <p class="text-gray-600">QR code not generated</p>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <div class="text-6xl mb-4">👥</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">No Students Found</h3>
+            <p class="text-gray-600 mb-6">Register students to generate QR codes</p>
+            <a href="{% url 'register_student' %}" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition duration-200 hover-scale">
+                Register Student
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if students.has_other_pages %}
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        <div class="flex justify-center">
+            <nav class="flex space-x-2">
+                {% if students.has_previous %}
+                    <a href="?page=1" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">First</a>
+                    <a href="?page={{ students.previous_page_number }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Previous</a>
+                {% endif %}
+                <span class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                    Page {{ students.number }} of {{ students.paginator.num_pages }}
+                </span>
+                {% if students.has_next %}
+                    <a href="?page={{ students.next_page_number }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Next</a>
+                    <a href="?page={{ students.paginator.num_pages }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Last</a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Summary -->
+    {% if students %}
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Summary</h3>
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="text-center">
+                <p class="text-2xl font-bold text-blue-600">{{ students.paginator.count }}</p>
+                <p class="text-sm text-gray-600">Total Students</p>
+            </div>
+            <div class="text-center">
+                <p class="text-2xl font-bold text-green-600">{{ students.paginator.count }}</p>
+                <p class="text-sm text-gray-600">QR Codes Generated</p>
+            </div>
+            <div class="text-center">
+                <p class="text-2xl font-bold text-yellow-600">100%</p>
+                <p class="text-sm text-gray-600">Completion Rate</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+@media print {
+    .gradient-bg, nav, footer, button, a {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .bg-white {
+        background: white !important;
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+    
+    .print-break {
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
+    
+    .grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 20px !important;
+    }
+    
+    .text-center {
+        text-align: center !important;
+    }
+    
+    .text-xl {
+        font-size: 18px !important;
+    }
+    
+    .text-2xl {
+        font-size: 20px !important;
+    }
+    
+    .w-48 {
+        width: 150px !important;
+    }
+    
+    .h-48 {
+        height: 150px !important;
+    }
+}
+</style>
+{% endblock %}

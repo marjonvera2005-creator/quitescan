@@ -1,0 +1,1 @@
+web: gunicorn quitescan.wsgi --log-file -

@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Attendance Report - QUITESCAN{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="gradient-bg rounded-2xl p-8 text-white">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Attendance Report</h1>
+                    <p class="text-xl">View detailed attendance statistics and reports</p>
+                </div>
+            </div>
+            <a href="{% url 'admin_dashboard' %}" class="bg-white text-orange-600 px-6 py-3 rounded-xl font-semibold hover:bg-yellow-100 transition duration-200">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        <form method="get" class="flex flex-col md:flex-row gap-4 items-center">
+            <label for="date" class="text-sm font-medium text-gray-700">Select Date:</label>
+            <input type="date" name="date" id="date" value="{{ selected_date|date:'Y-m-d' }}" 
+                   class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200">
+            <button type="submit" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-2 rounded-lg font-semibold hover:from-yellow-600 hover:to-orange-600 transition duration-200">
+                📊 Generate Report
+            </button>
+        </form>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-lg hover-scale">
+            <div class="flex items-center">
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Students</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ total_students }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-lg hover-scale">
+            <div class="flex items-center">
+                <div class="bg-green-100 p-3 rounded-full">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Present Today</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ present_students }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-lg hover-scale">
+            <div class="flex items-center">
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Attendance Rate</p>
+                    <p class="text-2xl font-bold text-gray-900">
+                        {% if total_students > 0 %}
+                            {% widthratio present_students total_students 100 %}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly and Weekly Summaries -->
+    <div class="grid md:grid-cols-2 gap-6">
+        <!-- Monthly Summary -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Monthly Attendance Summary</h2>
+                <a href="{% url 'monthly_attendance_all' %}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                    View All →
+                </a>
+            </div>
+            <p class="text-sm text-gray-600 mb-4">Latest month check-ins</p>
+            {% if monthly_summary %}
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="font-semibold text-gray-900">{{ monthly_summary.month|date:"F Y" }}</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl font-bold text-blue-600">{{ monthly_summary.count }}</span>
+                        <span class="text-sm text-gray-500">students</span>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <p>No monthly data available</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Weekly Summary -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Weekly Attendance Summary</h2>
+                <a href="{% url 'weekly_attendance_all' %}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                    View All →
+                </a>
+            </div>
+            <p class="text-sm text-gray-600 mb-4">Latest week check-ins (7-day range)</p>
+            {% if weekly_summary %}
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="font-semibold text-gray-900">
+                            {{ weekly_summary_start|date:"M d, Y" }} – {{ weekly_summary_end|date:"M d, Y" }}
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl font-bold text-green-600">{{ weekly_summary.count }}</span>
+                        <span class="text-sm text-gray-500">students</span>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <p>No weekly data available</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Department Statistics -->
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Check-ins by Department - {{ selected_date|date:"F d, Y" }}</h2>
+        {% if department_stats %}
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for stat in department_stats %}
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Department</p>
+                            <p class="text-lg font-bold text-gray-900">{{ stat.department__name|default:"No Department" }}</p>
+                            {% if stat.department__code %}
+                            <p class="text-xs text-gray-500 mt-1">Code: {{ stat.department__code }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="text-right">
+                            <p class="text-3xl font-bold text-blue-600">{{ stat.check_in_count }}</p>
+                            <p class="text-xs text-gray-500">students</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-8">
+                <div class="text-6xl mb-4">📊</div>
+                <p class="text-gray-600 text-lg">No check-ins recorded for this date</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Attendance Details -->
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Attendance Details for {{ selected_date|date:"F d, Y" }}</h2>
+            <a href="{% url 'admin_dashboard' %}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition duration-200">
+                ← Back to Dashboard
+            </a>
+        </div>
+        
+        {% if student_attendance %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check In</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check Out</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for student, attendance in student_attendance.items %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ student.first_name }} {{ student.last_name }}</div>
+                                <div class="text-sm text-gray-500">{{ student.student_id }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ student.department|default:"N/A" }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if attendance.check_in %}
+                                    {% if attendance.check_out %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Completed
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            Checked In
+                                        </span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Absent
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if attendance.check_in %}
+                                    {{ attendance.check_in|date:"H:i" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if attendance.check_out %}
+                                    {{ attendance.check_out|date:"H:i" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if attendance.check_in and attendance.check_out %}
+                                    {% with duration=attendance.check_out|timeuntil:attendance.check_in %}
+                                        {{ duration }}
+                                    {% endwith %}
+                                {% elif attendance.check_in %}
+                                    <span class="text-yellow-600">Still in</span>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if student_attendance_page.has_other_pages %}
+            <div class="mt-6 flex justify-center">
+                <nav class="flex space-x-2">
+                    {% if student_attendance_page.has_previous %}
+                        <a href="?date={{ selected_date|date:'Y-m-d' }}&page=1" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">First</a>
+                        <a href="?date={{ selected_date|date:'Y-m-d' }}&page={{ student_attendance_page.previous_page_number }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Previous</a>
+                    {% endif %}
+                    <span class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                        Page {{ student_attendance_page.number }} of {{ student_attendance_page.paginator.num_pages }}
+                    </span>
+                    {% if student_attendance_page.has_next %}
+                        <a href="?date={{ selected_date|date:'Y-m-d' }}&page={{ student_attendance_page.next_page_number }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Next</a>
+                        <a href="?date={{ selected_date|date:'Y-m-d' }}&page={{ student_attendance_page.paginator.num_pages }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Last</a>
+                    {% endif %}
+                </nav>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4">📊</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">No Attendance Data</h3>
+                <p class="text-gray-600">No attendance records found for {{ selected_date|date:"F d, Y" }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Export Options -->
+    {% if student_attendance %}
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Export Report</h3>
+        <div class="flex space-x-4">
+            <button onclick="exportToCSV()" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition duration-200">
+                📄 Export to CSV
+            </button>
+            <button onclick="printReport()" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition duration-200">
+                🖨️ Print Report
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Export to CSV
+function exportToCSV() {
+    const table = document.querySelector('table');
+    const rows = table.querySelectorAll('tr');
+    let csv = [];
+    
+    rows.forEach(row => {
+        const cols = row.querySelectorAll('td, th');
+        const rowData = [];
+        cols.forEach(col => {
+            rowData.push('"' + col.textContent.trim() + '"');
+        });
+        csv.push(rowData.join(','));
+    });
+    
+    const csvContent = csv.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `attendance_report_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// Print report
+function printReport() {
+    window.print();
+}
+
+// Auto-submit form when date changes
+document.getElementById('date').addEventListener('change', function() {
+    this.form.submit();
+});
+</script>
+
+<style>
+@media print {
+    .gradient-bg, nav, footer, button, a {
+        display: none !important;
+    }
+    body {
+        background: rgb(255, 255, 255) !important;
+    }
+    .bg-white {
+        background: white !important;
+        box-shadow: none !important;
+    }
+}
+</style>
+{% endblock %}

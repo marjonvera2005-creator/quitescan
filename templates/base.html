@@ -1,0 +1,358 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}QUITESCAN - Student Attendance System{% endblock %}</title>
+    <link rel="icon" href="{% static 'images/Quitescan logo.png' %}" sizes="32x32">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'student-yellow': '#FFD700',
+                        'student-orange': '#FFA500',
+                        'student-gold': '#FFB347',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFB347 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.2);
+        }
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .animate-slide-in-left {
+            animation: slideInLeft 0.6s ease-out;
+        }
+        
+        .animate-slide-in-right {
+            animation: slideInRight 0.6s ease-out;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .animate-bounce-slow {
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        /* Stagger animation delays */
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        
+        /* Smooth transitions for interactive elements */
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        
+        /* Search bar focus animation */
+        .search-input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Table row hover animation */
+        .table-row {
+            transition: all 0.2s ease;
+        }
+        
+        .table-row:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Card entrance animation */
+        .card-entrance {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Number counter animation */
+        .number-counter {
+            transition: all 0.3s ease;
+        }
+        
+        .number-counter:hover {
+            transform: scale(1.1);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="gradient-bg shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-2">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="{% url 'index' %}" class="flex items-center space-x-3">
+                            <img src="{% static 'images/Quitescan logo.png' %}" alt="QUITESCAN Logo" class="h-[4.5rem] w-auto">
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {% if user.is_authenticated and user.is_staff %}
+                        <a href="{% url 'admin_dashboard' %}" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium">Admin Panel</a>
+                        <button onclick="showLogoutModal()" class="bg-white text-orange-600 hover:bg-yellow-100 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
+                        <div class="relative">
+                            <button id="about-toggle" type="button" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1">
+                                <span>About</span>
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.062l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div id="about-panel" class="hidden absolute right-0 mt-3 w-[28rem] bg-white text-gray-900 rounded-2xl shadow-2xl border border-orange-100 overflow-hidden z-50">
+                                <div class="p-5 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-lg font-semibold text-orange-600">QUITESCAN</p>
+                                            <p class="text-sm text-gray-500">Smart Attendance System</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button type="button" class="about-tab px-3 py-2 rounded-xl text-sm font-semibold border border-gray-200 hover:border-orange-400 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300" data-about-target="logo">
+                                            Logo
+                                        </button>
+                                        <button type="button" class="about-tab px-3 py-2 rounded-xl text-sm font-semibold border border-gray-200 hover:border-orange-400 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300" data-about-target="poster">
+                                            Poster
+                                        </button>
+                                        <button type="button" class="about-tab px-3 py-2 rounded-xl text-sm font-semibold border border-gray-200 hover:border-orange-400 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300" data-about-target="advertisement">
+                                            Advertisement
+                                        </button>
+                                    </div>
+                                    <div class="space-y-4">
+                                        <div class="about-section flex gap-4" data-about-section="logo">
+                                            <div class="w-1/2 rounded-2xl border border-gray-100 p-3 bg-gray-50 flex items-center justify-center">
+                                                <img src="{% static 'images/Quitescan logo.png' %}" alt="QUITESCAN Logo" class="max-h-40 object-contain">
+                                            </div>
+                                            <div class="w-1/2">
+                                                <p class="text-sm text-black-500 uppercase tracking-wide mb-1">Logo Description</p>
+                                                <p class="text-xs text-gray-700 leading-relaxed">
+                                                    The QUITESCAN logo features an open yellow book with a QR code at the center, representing the blend of education and modern digital technology.
+                                                    It is surrounded by a gray frame and a blue ring decorated with stars and laurel branches, symbolizing excellence and academic achievement.
+                                                    The words “QUITESCAN” and “BIPSU,” along with the gold outer border, give it a formal and professional look suitable for university use.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="about-section flex gap-4 hidden" data-about-section="poster">
+                                            <div class="w-1/2 rounded-2xl border border-gray-100 overflow-hidden bg-gray-50">
+                                                <img src="{% static 'images/Quitescan Poster.png' %}" alt="QUITESCAN Poster" class="w-full h-48 object-contain">
+                                            </div>
+                                            <div class="w-1/2">
+                                                <p class="text-sm text-gray-500 uppercase tracking-wide mb-1">Poster Description</p>
+                                                <p class="text-xs text-gray-700 leading-relaxed">
+                                                   The QUITESCAN poster features a bright orange background with a central QR code and a four-step guide: open your QR code, scan to check in, study or rest, and scan to check out. The bold heading “SCAN. ENTER. LEARN. REST.” and essential details like launch date, hours, and location make it clear and visually appealing.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'student_scan' %}" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium">Scan QR Code</a>
+                        {% if not user.is_authenticated %}
+                        <a href="{% url 'admin_gate' %}" class="bg-white text-blue-900 hover:bg-blue-50 px-4 py-2 rounded-md text-sm font-medium">Admin Login</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            {% for message in messages %}
+                <div class="bg-{{ message.tags }}-100 border border-{{ message.tags }}-400 text-{{ message.tags }}-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <span class="block sm:inline">{{ message }}</span>
+                </div>
+            {% endfor %}
+            </div>
+    {% endif %}
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Confirm Logout</h3>
+            <p class="text-gray-600 mb-6">Are you sure you want to logout?</p>
+            <div class="flex space-x-4">
+                <button onclick="confirmLogout()" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Yes</button>
+                <button onclick="hideLogoutModal()" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-4 mt-10">
+        <div class="max-w-3xl mx-auto px-4 sm:px-5 lg:px-8">
+            <div class="text-center">
+                <p class="text-lg font-semibold">QUITESCAN - Student Attendance System</p>
+                <p class="text-sm mt-2">For students studying, resting, or meeting</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Logout modal functions
+        function showLogoutModal() {
+            document.getElementById('logoutModal').classList.remove('hidden');
+        }
+        
+        function hideLogoutModal() {
+            document.getElementById('logoutModal').classList.add('hidden');
+        }
+        
+        function confirmLogout() {
+            window.location.href = '/logout/';
+        }
+        
+
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            const aboutToggle = document.getElementById('about-toggle');
+            const aboutPanel = document.getElementById('about-panel');
+            const aboutTabs = document.querySelectorAll('.about-tab');
+            const aboutSections = document.querySelectorAll('.about-section');
+            const advertisementUrl = 'https://youtu.be/PZFiSbkzUr4';
+
+            if (aboutToggle && aboutPanel) {
+                const hidePanel = () => aboutPanel.classList.add('hidden');
+                const showPanel = () => aboutPanel.classList.remove('hidden');
+                const setActiveTab = (target) => {
+                    aboutTabs.forEach((tab) => {
+                        if (tab.dataset.aboutTarget === target) {
+                            tab.classList.add('border-orange-400', 'text-orange-600', 'bg-orange-50');
+                        } else {
+                            tab.classList.remove('border-orange-400', 'text-orange-600', 'bg-orange-50');
+                        }
+                    });
+
+                    aboutSections.forEach((section) => {
+                        if (section.dataset.aboutSection === target) {
+                            section.classList.remove('hidden');
+                        } else {
+                            section.classList.add('hidden');
+                        }
+                    });
+                };
+
+                aboutToggle.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    if (aboutPanel.classList.contains('hidden')) {
+                        showPanel();
+                    } else {
+                        hidePanel();
+                    }
+                });
+
+                document.addEventListener('click', function (event) {
+                    if (!aboutPanel.contains(event.target) && !aboutToggle.contains(event.target)) {
+                        hidePanel();
+                    }
+                });
+
+                if (aboutTabs.length) {
+                    aboutTabs.forEach((tab) => {
+                        tab.addEventListener('click', function (event) {
+                            event.stopPropagation();
+                            const target = tab.dataset.aboutTarget;
+                            if (target === 'advertisement') {
+                                window.open(advertisementUrl, '_blank', 'noopener');
+                                hidePanel();
+                                return;
+                            }
+                            setActiveTab(target);
+                        });
+                    });
+                    setActiveTab('logo');
+                }
+            }
+        });
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

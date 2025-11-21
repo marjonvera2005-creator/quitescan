@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registration Success - QUITESCAN{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <div class="card-shadow rounded-2xl p-12">
+        <div class="mb-8">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Registration Submitted Successfully!</h1>
+            <p class="text-gray-600 text-lg mb-6">
+                Your registration has been submitted and is pending admin approval. 
+                You will receive an email notification once your registration is reviewed.
+            </p>
+        </div>
+
+        <div class="bg-blue-50 rounded-lg p-6 mb-8">
+            <h3 class="font-semibold text-blue-800 mb-2">What happens next?</h3>
+            <ul class="text-blue-700 text-left space-y-2">
+                <li class="flex items-center">
+                    <span class="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
+                    Admin will review your registration details
+                </li>
+                <li class="flex items-center">
+                    <span class="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
+                    You'll receive an email with the approval/rejection decision
+                </li>
+                <li class="flex items-center">
+                    <span class="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
+                    If approved, you'll get access to QR code scanning
+                </li>
+            </ul>
+        </div>
+
+        <div class="flex justify-center space-x-4">
+            <a href="{% url 'index' %}" class="bg-orange-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-orange-700 hover-scale">
+                Back to Home
+            </a>
+            <a href="{% url 'student_register' %}" class="bg-gray-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-700 hover-scale">
+                Register Another Student
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

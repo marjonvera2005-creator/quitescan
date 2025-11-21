@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: quitescan
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn quitescan.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.4
+      - key: DEBUG
+        value: False

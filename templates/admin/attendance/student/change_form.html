@@ -1,0 +1,90 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .qr-code-section {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border: 1px solid #ddd;
+    }
+    .qr-code-image {
+        text-align: center;
+        margin: 20px 0;
+    }
+    .qr-code-image img {
+        max-width: 300px;
+        height: auto;
+        border: 3px solid #FFD700;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .qr-code-text {
+        font-family: monospace;
+        background: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin: 10px 0;
+        word-break: break-all;
+    }
+    .download-btn {
+        background: #FFD700;
+        color: #333;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        margin: 10px 5px;
+        font-weight: bold;
+    }
+    .download-btn:hover {
+        background: #FFA500;
+        color: #fff;
+    }
+    .instructions {
+        background: #e8f4fd;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 4px solid #2196F3;
+        margin: 15px 0;
+    }
+</style>
+{% endblock %}
+
+{% block field_sets %}
+{{ block.super }}
+
+{% if original.qr_code %}
+<div class="qr-code-section">
+    <h2>🎯 QR Code for Attendance</h2>
+    
+    <div class="instructions">
+        <strong>How to use this QR code:</strong><br>
+        1. Students can scan this QR code using the scanning page<br>
+        2. The QR code contains a unique identifier for this student<br>
+        3. Each scan will automatically log the student in or out
+    </div>
+
+    <div class="qr-code-image">
+        <img src="{{ original.qr_image.url }}" alt="QR Code for {{ original.first_name }} {{ original.last_name }}">
+    </div>
+
+    <div style="text-align: center;">
+        <strong>QR Code Text:</strong><br>
+        <div class="qr-code-text">{{ original.qr_code }}</div>
+        
+        <a href="{{ original.qr_image.url }}" class="download-btn" target="_blank">
+            📥 Download QR Code Image
+        </a>
+        
+        <a href="{% url 'student_scan' %}" class="download-btn" target="_blank">
+            📱 Test QR Scanning
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

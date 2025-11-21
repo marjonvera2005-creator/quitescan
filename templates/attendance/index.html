@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}QUITESCAN - Welcome{% endblock %}
+<link rel="icon" href="{% static 'img/Quitescan logo.png' %}" sizes="32x32">
+
+{% block content %}
+<div class="text-center">
+    <!-- Hero Section -->
+    <div class="gradient-bg rounded-3xl p-12 mb-12 card-shadow">
+        <div class="text-center mb-8">
+            <img src="{% static 'images/Quitescan logo.png' %}" alt="QUITESCAN Logo" class="h-24 w-auto mx-auto mb-6">
+            <h1 class="text-5xl font-bold text-white mb-6">Welcome to QUITESCAN</h1>
+            <p class="text-xl text-white mb-8">The smart attendance system for students studying, resting, or meeting</p>
+        </div>
+        <div class="flex justify-center space-x-6">
+            <a href="{% url 'student_scan' %}" class="bg-white text-orange-600 hover:bg-yellow-100 px-8 py-3 rounded-full font-semibold text-lg hover-scale">
+                📱 Scan QR Code
+            </a>
+            <a href="{% url 'student_register' %}" class="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3 rounded-full font-semibold text-lg hover-scale">
+                📝 Register as Student
+            </a>
+            <a href="{% url 'admin_gate' %}" class="bg-blue-900 text-white hover:bg-blue-800 px-8 py-3 rounded-full font-semibold text-lg hover-scale">
+                👨‍💼 Admin Login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
