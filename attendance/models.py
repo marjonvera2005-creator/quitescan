@@ -37,7 +37,7 @@ class Student(models.Model):
     email = models.EmailField(unique=True)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
     qr_code = models.CharField(max_length=255, unique=True, blank=True)
-    qr_image = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
+    qr_image = models.CharField(max_length=255, blank=True, null=True)  # Temporarily disabled for deployment
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=[('active', 'Active'), ('inactive', 'Inactive')], default='active')
     registration_status = models.CharField(max_length=10, choices=REGISTRATION_STATUS_CHOICES, default='pending')
@@ -69,9 +69,10 @@ class Student(models.Model):
         buffer = BytesIO()
         img.save(buffer, format='PNG')
         
-        filename = f'qr_code_{self.student_id}.png'
-        self.qr_image.save(filename, File(buffer), save=False)
-        self.save()
+        # Temporarily disabled for deployment
+        # filename = f'qr_code_{self.student_id}.png'
+        # self.qr_image.save(filename, File(buffer), save=False)
+        # self.save()
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.student_id})"
