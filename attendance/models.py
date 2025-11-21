@@ -1,10 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
-import qrcode
-from io import BytesIO
-from django.core.files import File
-from PIL import Image
 import uuid
+
+try:
+    import qrcode
+    from io import BytesIO
+    from django.core.files import File
+    from PIL import Image
+    QR_AVAILABLE = True
+except ImportError:
+    QR_AVAILABLE = False
 
 class Department(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -49,10 +54,13 @@ class Student(models.Model):
         super().save(*args, **kwargs)
         
         # Always ensure a QR image exists after initial save
-        if not self.qr_image:
+        if not self.qr_image and QR_AVAILABLE:
             self.generate_qr_code()
 
     def generate_qr_code(self):
+        if not QR_AVAILABLE:
+            return
+        
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(self.qr_code)
         qr.make(fit=True)
