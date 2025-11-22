@@ -217,8 +217,7 @@ function processQRCode(qrCode) {
     const send = () => fetch('{% url "process_scan" %}', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
     }).then(r => {
@@ -270,8 +269,7 @@ window.addEventListener('online', function () {
     fetch('{% url "process_scan" %}', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(next.payload)
     })

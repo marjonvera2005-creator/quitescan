@@ -49,16 +49,23 @@ class Student(models.Model):
     rejection_reason = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
+        # Generate QR code string if not exists
         if not self.qr_code:
             self.qr_code = str(uuid.uuid4())
+        
+        # Save the model first
+        is_new = self.pk is None
         super().save(*args, **kwargs)
         
-        # Always ensure a QR image exists after initial save
-        if not self.qr_image and QR_AVAILABLE:
-            self.generate_qr_code()
+        # Generate QR image after saving
+        if QR_AVAILABLE and (is_new or not self.qr_image):
+            try:
+                self.generate_qr_code()
+            except Exception as e:
+                print(f"QR generation error: {e}")
 
     def generate_qr_code(self):
-        if not QR_AVAILABLE:
+        if not QR_AVAILABLE or not self.qr_code:
             return
         
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
@@ -68,10 +75,11 @@ class Student(models.Model):
         img = qr.make_image(fill_color="black", back_color="white")
         buffer = BytesIO()
         img.save(buffer, format='PNG')
+        buffer.seek(0)
         
         filename = f'qr_code_{self.student_id}.png'
         self.qr_image.save(filename, File(buffer), save=False)
-        self.save()
+        Student.objects.filter(pk=self.pk).update(qr_image=self.qr_image)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.student_id})"

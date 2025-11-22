@@ -185,6 +185,15 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2 sm:space-x-4 flex-wrap">
+                    {% if user.is_authenticated and user.is_staff %}
+                        <a href="{% url 'admin_dashboard' %}" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium">Admin Panel</a>
+                        <button onclick="showLogoutModal()" class="bg-white text-orange-600 hover:bg-yellow-100 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
+                    {% else %}
+                        <a href="{% url 'student_scan' %}" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium">Scan QR Code</a>
+                        {% if not user.is_authenticated %}
+                        <a href="{% url 'admin_gate' %}" class="bg-white text-blue-900 hover:bg-blue-50 px-4 py-2 rounded-md text-sm font-medium">Admin Login</a>
+                        {% endif %}
+                    {% endif %}
                     <div class="relative">
                             <button id="about-toggle" type="button" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1">
                                 <span>About</span>
@@ -192,7 +201,7 @@
                                     <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.062l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
                                 </svg>
                             </button>
-                            <div id="about-panel" class="hidden absolute right-0 mt-3 w-[28rem] bg-white text-gray-900 rounded-2xl shadow-2xl border border-orange-100 overflow-hidden z-50">
+                            <div id="about-panel" class="hidden absolute right-0 mt-3 w-[28rem] max-w-[calc(100vw-2rem)] bg-white text-gray-900 rounded-2xl shadow-2xl border border-orange-100 overflow-hidden z-50">
                                 <div class="p-5 space-y-4">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -221,7 +230,7 @@
                                                 <p class="text-xs text-gray-700 leading-relaxed">
                                                     The QUITESCAN logo features an open yellow book with a QR code at the center, representing the blend of education and modern digital technology.
                                                     It is surrounded by a gray frame and a blue ring decorated with stars and laurel branches, symbolizing excellence and academic achievement.
-                                                    The words “QUITESCAN” and “BIPSU,” along with the gold outer border, give it a formal and professional look suitable for university use.
+                                                    The words "QUITESCAN" and "BIPSU," along with the gold outer border, give it a formal and professional look suitable for university use.
                                                 </p>
                                             </div>
                                         </div>
@@ -232,7 +241,24 @@
                                             <div class="w-1/2">
                                                 <p class="text-sm text-gray-500 uppercase tracking-wide mb-1">Poster Description</p>
                                                 <p class="text-xs text-gray-700 leading-relaxed">
-                                                   The QUITESCAN poster features a bright orange background with a central QR code and a four-step guide: open your QR code, scan to check in, study or rest, and scan to check out. The bold heading “SCAN. ENTER. LEARN. REST.” and essential details like launch date, hours, and location make it clear and visually appealing.</p>
+                                                   The QUITESCAN poster features a bright orange background with a central QR code and a four-step guide: open your QR code, scan to check in, study or rest, and scan to check out. The bold heading "SCAN. ENTER. LEARN. REST." and essential details like launch date, hours, and location make it clear and visually appealing.</p>
+                                            </div>
+                                        </div>
+                                        <div class="about-section flex gap-4 hidden" data-about-section="advertisement">
+                                            <div class="w-1/2 rounded-2xl border border-gray-100 p-3 bg-gray-50 flex items-center justify-center">
+                                                <div class="text-center">
+                                                    <div class="text-4xl mb-2">🎥</div>
+                                                    <p class="text-sm font-bold text-gray-700">Video Ad</p>
+                                                </div>
+                                            </div>
+                                            <div class="w-1/2">
+                                                <p class="text-sm text-gray-500 uppercase tracking-wide mb-1">Advertisement</p>
+                                                <p class="text-xs text-gray-700 leading-relaxed mb-3">
+                                                    Watch our promotional video showcasing QUITESCAN's features and benefits for student attendance management.
+                                                </p>
+                                                <a href="https://youtu.be/PZFiSbkzUr4" target="_blank" class="inline-block bg-red-500 text-white px-3 py-2 rounded-lg text-xs font-semibold hover:bg-red-600">
+                                                    Watch Video
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -240,15 +266,6 @@
                             </div>
                         </div>
                     </div>
-                    {% if user.is_authenticated and user.is_staff %}
-                        <a href="{% url 'admin_dashboard' %}" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium">Admin Panel</a>
-                        <button onclick="showLogoutModal()" class="bg-white text-orange-600 hover:bg-yellow-100 px-4 py-2 rounded-md text-sm font-medium">Logout</button>
-                    {% else %}
-                        <a href="{% url 'student_scan' %}" class="text-white hover:text-yellow-200 px-3 py-2 rounded-md text-sm font-medium">Scan QR Code</a>
-                        {% if not user.is_authenticated %}
-                        <a href="{% url 'admin_gate' %}" class="bg-white text-blue-900 hover:bg-blue-50 px-4 py-2 rounded-md text-sm font-medium">Admin Login</a>
-                        {% endif %}
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -305,8 +322,6 @@
         function confirmLogout() {
             window.location.href = '/logout/';
         }
-        
-
         
         document.addEventListener('DOMContentLoaded', function () {
             const aboutToggle = document.getElementById('about-toggle');

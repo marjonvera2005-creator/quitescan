@@ -1,0 +1,8 @@
+Force deployment timestamp: 2024-12-19 14:30:00
+This file forces Render to rebuild and deploy fresh code.
+Changes include:
+- Fixed QR code generation
+- Fixed About panel positioning  
+- Removed approval workflow
+- Fixed CSRF tokens
+- Updated navigation layout

@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# Install system dependencies
-apt-get update
-apt-get install -y libpq-dev python3-dev
+# Exit on error
+set -o errexit
 
-# Install Python packages
-pip install --upgrade pip
+# Install dependencies
 pip install -r requirements.txt
 
-# Django setup
-python manage.py collectstatic --no-input
+# Collect static files
+python manage.py collectstatic --noinput
+
+# Run migrations
 python manage.py migrate
+
+# Generate QR codes for existing students
+python manage.py generate_qr_codes

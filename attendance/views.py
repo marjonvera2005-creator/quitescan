@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+
 from django.utils import timezone
 from django.db.models import Count, Q
 from django.db.models.functions import TruncMonth, TruncWeek, TruncYear
@@ -26,7 +27,7 @@ def student_register(request):
         form = StudentSelfRegistrationForm(request.POST)
         if form.is_valid():
             student = form.save(commit=False)
-            student.registration_status = 'pending'
+            student.registration_status = 'approved'
             student.save()
             messages.success(request, 'Registration submitted successfully! Please wait for admin approval.')
             return redirect('registration_success')

@@ -2,10 +2,14 @@ services:
   - type: web
     name: quitescan
     env: python
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput --clear && python manage.py migrate && python manage.py generate_qr_codes"
     startCommand: "gunicorn quitescan.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.4
       - key: DEBUG
         value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_GATE_PASSWORD
+        value: admin123
