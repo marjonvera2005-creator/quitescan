@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /student/register/
+Allow: /student/scan/
+
+Disallow: /admin/
+Disallow: /admin-gate/
+Disallow: /dashboard/
+
+Sitemap: https://your-render-url.onrender.com/sitemap.xml

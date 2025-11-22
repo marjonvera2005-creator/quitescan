@@ -601,6 +601,43 @@ def admin_logout(request):
     messages.success(request, 'You have been logged out successfully.')
     return redirect('index')
 
+def robots_txt(request):
+    """Robots.txt for SEO"""
+    robots_content = """User-agent: *
+Allow: /
+Allow: /student/register/
+Allow: /student/scan/
+
+Disallow: /admin/
+Disallow: /admin-gate/
+Disallow: /dashboard/
+
+Sitemap: {}/sitemap.xml""".format(request.build_absolute_uri('/').rstrip('/'))
+    return HttpResponse(robots_content, content_type='text/plain')
+
+def sitemap_xml(request):
+    """Sitemap.xml for SEO"""
+    base_url = request.build_absolute_uri('/').rstrip('/')
+    sitemap_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>{base_url}/</loc>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>{base_url}/student/register/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>{base_url}/student/scan/</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+</urlset>"""
+    return HttpResponse(sitemap_content, content_type='application/xml')
+
 def service_worker(request):
     """Service Worker for offline caching"""
     sw_js = """

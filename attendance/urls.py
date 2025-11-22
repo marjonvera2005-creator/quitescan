@@ -21,4 +21,6 @@ urlpatterns = [
     path('admin/edit-department/<int:department_id>/', views.edit_department, name='edit_department'),
     path('logout/', views.admin_logout, name='admin_logout'),
     path('sw.js', views.service_worker, name='service_worker'),
+    path('robots.txt', views.robots_txt, name='robots_txt'),
+    path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
 ]

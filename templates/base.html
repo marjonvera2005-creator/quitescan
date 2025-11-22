@@ -8,6 +8,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>{% block title %}QUITESCAN - Student Attendance System{% endblock %}</title>
+    <meta name="description" content="QUITESCAN - Modern QR code-based student attendance system for universities and schools. Easy check-in/out with mobile scanning.">
+    <meta name="keywords" content="student attendance, QR code, attendance system, school management, university attendance, check-in system">
+    <meta name="author" content="QUITESCAN">
+    <meta property="og:title" content="QUITESCAN - Student Attendance System">
+    <meta property="og:description" content="Modern QR code-based student attendance system for universities and schools.">
+    <meta property="og:type" content="website">
     <link rel="icon" href="{% static 'images/Quitescan logo.png' %}" sizes="32x32">
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -383,6 +389,21 @@
                 }
             }
         });
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "QUITESCAN",
+        "description": "Student attendance system with QR code scanning",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
     </script>
     <script>
         if ('serviceWorker' in navigator) {
