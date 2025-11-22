@@ -55,6 +55,7 @@ def registration_success(request):
     return render(request, 'attendance/student/registration_success.html')
 
 
+@csrf_exempt
 def admin_gate(request):
     """Admin login - password required"""
     # If user is already authenticated and is staff, redirect to dashboard
