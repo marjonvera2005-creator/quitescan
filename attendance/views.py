@@ -23,14 +23,34 @@ def index(request):
 
 def student_register(request):
     """Student self-registration page"""
+    # Ensure at least one department exists
+    if not Department.objects.exists():
+        Department.objects.create(
+            name='General Studies',
+            code='GEN',
+            description='General Studies Department',
+            is_active=True
+        )
+    
     if request.method == 'POST':
+        print(f"POST data: {request.POST}")
+        print(f"CSRF token in POST: {'csrfmiddlewaretoken' in request.POST}")
         form = StudentSelfRegistrationForm(request.POST)
+        print(f"Form is valid: {form.is_valid()}")
         if form.is_valid():
-            student = form.save(commit=False)
-            student.registration_status = 'approved'
-            student.save()
-            messages.success(request, 'Registration submitted successfully! Please wait for admin approval.')
-            return redirect('registration_success')
+            try:
+                student = form.save(commit=False)
+                student.registration_status = 'approved'
+                student.save()
+                print(f"Student saved: {student}")
+                messages.success(request, 'Registration completed successfully! Your QR code has been generated.')
+                return redirect('registration_success')
+            except Exception as e:
+                print(f"Save error: {e}")
+                messages.error(request, f'Registration failed: {str(e)}')
+        else:
+            print(f"Form errors: {form.errors}")
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = StudentSelfRegistrationForm()
     
@@ -585,6 +605,15 @@ def admin_logout(request):
         del request.session['admin_gate_ok']
     messages.success(request, 'You have been logged out successfully.')
     return redirect('index')
+
+def csrf_failure(request, reason=""):
+    """Custom CSRF failure view"""
+    print(f"CSRF failure: {reason}")
+    print(f"Request method: {request.method}")
+    print(f"Request path: {request.path}")
+    print(f"Cookies: {request.COOKIES}")
+    messages.error(request, f'CSRF verification failed: {reason}. Please try again.')
+    return redirect('student_register')
 
 def service_worker(request):
     """Service Worker for offline caching"""

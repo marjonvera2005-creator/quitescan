@@ -126,3 +126,6 @@ if not DEBUG:
 LOGIN_URL = '/admin-gate/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
+
+# CSRF Settings
+CSRF_FAILURE_VIEW = 'attendance.views.csrf_failure'
