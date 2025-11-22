@@ -21,6 +21,7 @@ def index(request):
     """Landing page for QUITESCAN"""
     return render(request, 'attendance/index.html')
 
+@csrf_exempt
 def student_register(request):
     """Student self-registration page"""
     # Ensure at least one department exists
