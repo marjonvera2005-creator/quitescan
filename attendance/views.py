@@ -33,23 +33,17 @@ def student_register(request):
         )
     
     if request.method == 'POST':
-        print(f"POST data: {request.POST}")
-        print(f"CSRF token in POST: {'csrfmiddlewaretoken' in request.POST}")
         form = StudentSelfRegistrationForm(request.POST)
-        print(f"Form is valid: {form.is_valid()}")
         if form.is_valid():
             try:
                 student = form.save(commit=False)
                 student.registration_status = 'approved'
                 student.save()
-                print(f"Student saved: {student}")
                 messages.success(request, 'Registration completed successfully! Your QR code has been generated.')
                 return redirect('registration_success')
             except Exception as e:
-                print(f"Save error: {e}")
                 messages.error(request, f'Registration failed: {str(e)}')
         else:
-            print(f"Form errors: {form.errors}")
             messages.error(request, 'Please correct the errors below.')
     else:
         form = StudentSelfRegistrationForm()
@@ -62,17 +56,16 @@ def registration_success(request):
 
 
 def admin_gate(request):
-    """Pre-password gate before accessing Django admin/login"""
+    """Admin login - password required"""
     # If user is already authenticated and is staff, redirect to dashboard
     if request.user.is_authenticated and request.user.is_staff:
         return redirect('admin_dashboard')
     
     ADMIN_GATE_PASSWORD = os.environ.get('ADMIN_GATE_PASSWORD', 'admin123')
+    
     if request.method == 'POST':
         password = request.POST.get('password', '')
         if password == ADMIN_GATE_PASSWORD:
-            # Set a simple session flag
-            request.session['admin_gate_ok'] = True
             # Create or login admin user
             from django.contrib.auth.models import User
             from django.contrib.auth import login
@@ -86,7 +79,7 @@ def admin_gate(request):
             login(request, admin_user)
             return redirect('admin_dashboard')
         else:
-            messages.error(request, 'Incorrect password')
+            messages.error(request, 'Incorrect admin password')
     
     return render(request, 'attendance/admin/gate.html')
 
@@ -605,15 +598,6 @@ def admin_logout(request):
         del request.session['admin_gate_ok']
     messages.success(request, 'You have been logged out successfully.')
     return redirect('index')
-
-def csrf_failure(request, reason=""):
-    """Custom CSRF failure view"""
-    print(f"CSRF failure: {reason}")
-    print(f"Request method: {request.method}")
-    print(f"Request path: {request.path}")
-    print(f"Cookies: {request.COOKIES}")
-    messages.error(request, f'CSRF verification failed: {reason}. Please try again.')
-    return redirect('student_register')
 
 def service_worker(request):
     """Service Worker for offline caching"""
