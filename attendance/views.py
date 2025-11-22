@@ -43,6 +43,10 @@ def registration_success(request):
 
 def admin_gate(request):
     """Pre-password gate before accessing Django admin/login"""
+    # If user is already authenticated and is staff, redirect to dashboard
+    if request.user.is_authenticated and request.user.is_staff:
+        return redirect('admin_dashboard')
+    
     ADMIN_GATE_PASSWORD = os.environ.get('ADMIN_GATE_PASSWORD', 'admin123')
     if request.method == 'POST':
         password = request.POST.get('password', '')
@@ -576,6 +580,9 @@ def qr_codes_view(request):
 def admin_logout(request):
     """Custom logout view"""
     logout(request)
+    # Clear admin session
+    if 'admin_gate_ok' in request.session:
+        del request.session['admin_gate_ok']
     messages.success(request, 'You have been logged out successfully.')
     return redirect('index')
 
