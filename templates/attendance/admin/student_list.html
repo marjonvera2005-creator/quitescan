@@ -97,10 +97,17 @@
 
             <!-- Actions -->
             <div class="flex space-x-2 mt-4">
-                <button onclick="downloadQR('{{ student.qr_code }}', '{{ student.first_name }} {{ student.last_name }}')" 
-                        class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:from-blue-600 hover:to-blue-700 transition duration-200">
+                {% if student.qr_image %}
+                <a href="{% url 'download_qr' student.id %}" 
+                   class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:from-blue-600 hover:to-blue-700 transition duration-200 text-center">
                     📥 Download QR
+                </a>
+                {% else %}
+                <button disabled 
+                        class="flex-1 bg-gray-300 text-gray-500 py-2 px-3 rounded-lg text-sm font-medium cursor-not-allowed">
+                    📥 No QR Code
                 </button>
+                {% endif %}
                 <button onclick="copyQRCode('{{ student.qr_code }}')" 
                         class="bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 transition duration-200">
                     📋 Copy
@@ -197,47 +204,9 @@ function copyQRCode(qrCode) {
     });
 }
 
-// Download QR code
-function downloadQR(qrCode, studentName) {
-    // Create a canvas with the QR code
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 300;
-    canvas.height = 350;
-    
-    // Background
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 300, 350);
-    
-    // Title
-    ctx.fillStyle = '#1f2937';
-    ctx.font = 'bold 16px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('QUITESCAN QR Code', 150, 30);
-    
-    // Student name
-    ctx.font = '14px Arial';
-    ctx.fillText(studentName, 150, 50);
-    
-    // QR code placeholder (you would need to generate actual QR code here)
-    ctx.fillStyle = '#f3f4f6';
-    ctx.fillRect(75, 70, 150, 150);
-    ctx.fillStyle = '#9ca3af';
-    ctx.font = '12px Arial';
-    ctx.fillText('QR Code', 150, 145);
-    
-    // QR code text
-    ctx.fillStyle = '#6b7280';
-    ctx.font = '10px monospace';
-    ctx.fillText(qrCode, 150, 250);
-    
-    // Download
-    const link = document.createElement('a');
-    link.download = `qr_${studentName.replace(/\s+/g, '_')}.png`;
-    link.href = canvas.toDataURL();
-    link.click();
-    
-    showNotification('QR code downloaded!', 'success');
+// Download notification (called when download link is clicked)
+function showDownloadNotification() {
+    showNotification('QR code download started!', 'success');
 }
 
 // Show notification

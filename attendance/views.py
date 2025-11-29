@@ -638,6 +638,26 @@ def sitemap_xml(request):
 </urlset>"""
     return HttpResponse(sitemap_content, content_type='application/xml')
 
+@staff_member_required
+def download_qr_code(request, student_id):
+    """Download QR code image for a specific student"""
+    student = get_object_or_404(Student, id=student_id)
+    
+    if student.qr_image:
+        try:
+            file_path = student.qr_image.path
+            if os.path.exists(file_path):
+                with open(file_path, 'rb') as fh:
+                    response = HttpResponse(fh.read(), content_type="image/png")
+                    filename = f"QR_{student.student_id}_{student.first_name}_{student.last_name}.png"
+                    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+                    return response
+        except Exception as e:
+            messages.error(request, f'Error downloading QR code: {str(e)}')
+    
+    messages.error(request, 'QR code not found for this student')
+    return redirect('student_list')
+
 def service_worker(request):
     """Service Worker for offline caching"""
     sw_js = """

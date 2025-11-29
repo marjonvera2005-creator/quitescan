@@ -20,6 +20,7 @@ urlpatterns = [
     path('admin/manage-departments/', views.manage_departments, name='manage_departments'),
     path('admin/edit-department/<int:department_id>/', views.edit_department, name='edit_department'),
     path('logout/', views.admin_logout, name='admin_logout'),
+    path('download-qr/<int:student_id>/', views.download_qr_code, name='download_qr'),
     path('sw.js', views.service_worker, name='service_worker'),
     path('robots.txt', views.robots_txt, name='robots_txt'),
     path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
